@@ -1,5 +1,0 @@
-location / {
-  if (!-e $request_filename){
-    rewrite ^/(.*)$ /e76215b3e72491da90e7410109e764a1.php?s=/$1 last;
-  }
-}
