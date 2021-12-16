@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>实时视频监控</title>
+    <style>
+        body{margin: 0px; padding: 0px;}
+        #myPlayer{max-width: 1200px;width: 100%;}
+    </style>
+    <script src="https://open.ys7.com/sdk/js/2.0/ezuikit.js"></script>
+</head>
+<body>
+  <video id="myPlayer" controls playsInline webkit-playsinline autoplay>
+    <source src="{$video['rtmp']}" type="rtmp/flv" />
+  </video>
+  <script>
+    var player = new EZuikit.EZUIPlayer('myPlayer');
+    var delaytime = 1000 * 60 * 10;
+    setTimeout(function () {
+      player.stop();
+    }, delaytime);
+  </script>
+</body>
+</html>

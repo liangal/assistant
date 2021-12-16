@@ -1,0 +1,251 @@
+<link rel="stylesheet" href="assets/module/formSelects/formSelects-v4.css"/>
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form toolbar">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <select id="city_id">
+                            <option value="">筛选城市分类</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <input id="date_at" class="layui-input date-icon" type="text" placeholder="显示时间段" autocomplete="off"/>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="nconvstatisticsBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索
+                        </button>
+                        <button id="nconvstatisticsBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="layui-table" id="userTable" lay-filter="userTable"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="userTableBar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<!-- 表单弹窗 -->
+<script type="text/html" id="modelUser">
+    <form id="modelUserForm" lay-filter="modelUserForm" class="layui-form model-form">
+        <input name="id" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="field-color-red">*</span>省份/城市</label>
+            <div class="layui-input-block">
+                <select name="city_id" xm-select="city_id">
+                    <option value="">请选择省份/城市</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确诊人数</label>
+            <div class="layui-input-block">
+                <input name="define" value="0" placeholder="请输入确诊人数" type="number" class="layui-input" maxlength="20"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">疑似人数</label>
+            <div class="layui-input-block">
+                <input name="doubt" value="0" placeholder="请输入确诊人数" type="number" class="layui-input" maxlength="20"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">重症人数</label>
+            <div class="layui-input-block">
+                <input name="critically_ill" value="0" placeholder="请输入确诊人数" type="number" class="layui-input" maxlength="20"/>
+            </div>
+        </div>          
+        <div class="layui-form-item">
+            <label class="layui-form-label">死亡人数</label>
+            <div class="layui-input-block">
+                <input name="death" value="0" placeholder="请输入确诊人数" type="number" class="layui-input" maxlength="20"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">治愈人数</label>
+            <div class="layui-input-block">
+                <input name="cure" value="0" placeholder="请输入确诊人数" type="number" class="layui-input" maxlength="20"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">创建时间</label>
+            <div class="layui-input-block">
+                <input id="created_at" type="text" name="created_at" placeholder="请选择创建时间，不选择默认为当前时间" class="layui-input date-icon" autocomplete="off" lay-verType="msg"/>
+            </div>
+        </div>         
+        <div class="layui-form-item text-right">
+            <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+            <button id="btnSave" class="layui-btn" lay-filter="modelUserSubmit" lay-submit>保存</button>
+        </div>
+    </form>
+</script>
+<script>
+    layui.use(['layer', 'table', 'form', 'util', 'config', 'admin', 'laydate'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var form = layui.form;
+        var util = layui.util;
+        var config = layui.config;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+
+        var citys = "";
+        var city_id = 10;
+
+        // 城市分类
+        admin.req('category/list', {id: city_id}, function (res) {
+            citys = res.msg;
+            $("#city_id").append(citys);
+        }, 'post');
+
+        // 渲染laydate
+        laydate.render({elem: '#date_at', type: 'datetime', range: '到'});
+
+        // 渲染表格
+        var insTb = table.render({
+            elem: '#userTable',
+            url: config.base_server + 'ncov/statistics/list',
+            method: 'post',
+            where: {
+                
+            },
+            headers: {
+                'Authorization': 'Bearer ' + config.getToken().access_token
+            },
+            page: true,
+            cellMinWidth: 100,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'address', title: '省份/城市'},
+                {field: 'define', title: '确诊人数', width: 100},
+                {field: 'doubt', title: '疑似人数', width: 110},
+                {field: 'critically_ill', title: '重症人数', width: 100},
+                {field: 'death', title: '死亡人数', width: 100},
+                {field: 'cure', title: '治愈人数', width: 100},
+                {field: 'created_at', title: '发布时间', width: 180},
+                {align: 'center', toolbar: '#userTableBar', title: '操作', width: 150}
+            ]],
+            done: function(res, curr, count){
+                if(!admin.hasPerm('ncov:statistics:edit')){
+                    $("a[lay-event='edit']").remove();
+                }
+                if(!admin.hasPerm('ncov:statistics:delete')){
+                    $("a[lay-event='del']").remove();
+                }
+            }
+        });
+
+        form.render('select');
+        
+        setTimeout(function(){ 
+            form.render('select');
+        }, 1000);
+        
+        // 添加按钮点击事件
+        if(!admin.hasPerm('ncov:statistics:create')){
+            $("#nconvstatisticsBtnAdd").remove();
+        }
+        else
+        {
+            $('#nconvstatisticsBtnAdd').click(function () {
+                showEditModel();
+            });
+        }
+        
+        // 搜索按钮点击事件
+        $('#nconvstatisticsBtnSearch').click(function () {
+            var date_at = $('#date_at').val();
+            var city_id = $('#city_id').val();
+            console.log(date_at);
+            insTb.reload({where: {city_id: city_id, date_at: date_at}});
+        });
+
+        // 工具条点击事件
+        table.on('tool(userTable)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            } else if (layEvent === 'del') {  // 删除
+                layer.confirm('确定要删除吗？', {
+                    skin: 'layui-layer-admin'
+                }, function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('ncov/statistics/delete', {
+                        id: data.id
+                    }, function (res) {
+                        layer.closeAll('loading');
+                        if (res.code == 200) {
+                            layer.msg(res.msg, {icon: 1});
+                            insTb.reload();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }, 'post');
+                });
+            }
+        });
+
+        // 显示表单弹窗
+        function showEditModel(nconvstatistics) {
+            admin.open({
+                type: 1,
+                title: (nconvstatistics ? '修改' : '添加') + '感染人员统计',
+                area: '800px',
+                content: $('#modelUser').html(),
+                success: function (layero, dIndex) {
+                    if(!admin.hasPerm('ncov:statistics:update') && !admin.hasPerm('ncov:statistics:store')){
+                        $("#btnSave").remove();
+                    }
+
+                    var url = nconvstatistics ? 'ncov/statistics/update' : 'ncov/statistics/store';
+                    
+                    var date_option = {elem: '#created_at', type: 'datetime'};
+
+                    // 城市分类
+                    $("select[name='city_id']").append(citys);
+
+                    // 回显数据
+                    if (nconvstatistics) {
+                        form.val('modelUserForm', nconvstatistics);      
+                    } else {
+                        form.render('radio');
+                    }
+                    
+                    // 渲染laydate
+                    laydate.render(date_option);
+
+                    form.render('select');
+
+                    // 表单提交事件
+                    form.on('submit(modelUserSubmit)', function (data) {
+                        layer.load(2);
+
+                        admin.req(url, data.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.close(dIndex);
+                                layer.msg(res.msg, {icon: 1});
+                                insTb.reload();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'post');
+
+                        return false;
+                    });
+                }
+            });
+        };
+    });
+</script>

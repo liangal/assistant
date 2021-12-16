@@ -1,0 +1,11 @@
+<iframe id="position" frameborder="0" width="100%" height="99%" scrolling="no"></iframe>
+
+<script>
+    layui.use(['config'], function () {
+        var $ = layui.jquery;
+        var config = layui.config;
+
+        var url = '/manage/security/position/index?token=' + config.getToken().access_token + '&number=' + Math.random();
+        $("#position").attr('src', url)
+    });
+</script>

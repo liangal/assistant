@@ -1,0 +1,212 @@
+    <style>
+    .layui-card-pointer {cursor: pointer;}
+    </style>
+    <div class="layui-fluid">
+        <div class="layui-row layui-col-space15" id="statistics_box">
+            <div class="layui-col-xs12 layui-col-sm6 layui-col-md4">
+                <div class="layui-card layui-card-pointer">
+                    <div class="layui-card-header">
+                        站点访问量<span class="layui-badge layui-bg-orange pull-right">全部</span>
+                    </div>
+                    <div class="layui-card-body">
+                        <p class="lay-big-font" id="ncov-total">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm6 layui-col-md4">
+                <div class="layui-card layui-card-pointer">
+                    <div class="layui-card-header">
+                        站点访问量<span class="layui-badge layui-bg-blue pull-right">今日</span>
+                    </div>
+                    <div class="layui-card-body">
+                        <p class="lay-big-font" id="ncov-today-total">-</p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm6 layui-col-md4">
+                <div class="layui-card layui-card-pointer">
+                    <div class="layui-card-header">
+                        站点访问量<span class="layui-badge layui-bg-black pull-right">昨日</span>
+                    </div>
+                    <div class="layui-card-body">
+                        <p class="lay-big-font" id="ncov-yesterday-total">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-lg12 layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">站点访问量统计图表</div>
+                    <div class="layui-card-body">
+                        <div id="tjDivMonth" style="height: 330px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-row layui-col-space15">
+            <div class="layui-col-lg12 layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header">区域访问量统计表</div>
+                    <div id="citys" class="layui-card-body" style="zoom:1;overflow:hidden">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/manage/assets/libs/echarts/echarts.min.js"></script>
+    <script>
+        layui.use(['layer', 'admin'], function () {
+            var $ = layui.jquery;
+            var layer = layui.layer;
+            var admin = layui.admin;
+            
+            $("#statistics_box .layui-card").mouseover(function () {
+                oldColor = $(this).css("background-color");
+                $(this).css("background-color","#d9e8fb");
+            }).mouseout(function () {
+                $(this).css("background-color",oldColor);
+            });
+    
+            admin.req('statistic/site/index', {}, function (res) {
+                if (res.code == 200) {
+                    $data = res.msg;
+
+                    var site_total = $data.site_total;
+
+                    $("#ncov-total").text(site_total.totals.all);
+                    $("#ncov-today-total").text(site_total.totals.today);
+                    $("#ncov-yesterday-total").text(site_total.totals.yesterday);
+
+                    ncovChart(site_total.charts);
+
+                    $("#citys").append(cityTotalHtml(site_total.charts.city));
+
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            }, 'post');
+
+            // 站点访问量统计图表
+            function ncovChart(chart_data) {
+                var ncovCharts = echarts.init(document.getElementById('tjDivMonth'));
+                
+                var ncov_options = {
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            lineStyle: {
+                                color: '#E0E0E0'
+                            }
+                        },
+                        formatter: '{b}号<br/><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:#10B4E8;"></span>{a0}: {c0}'
+                    },
+                    color: ['#10B4E8'],
+                    legend: {
+                        orient: 'vertical',
+                        right: '0px',
+                        top: '0px',
+                        data: ['访问量'],
+                        textStyle: {
+                            color: '#595959'
+                        }
+                    },
+                    grid: {
+                        top: '75px',
+                        left: '35px',
+                        right: '55px',
+                        bottom: '40px'
+                    },
+                    xAxis: {
+                        name: '日期',
+                        nameTextStyle: {
+                            color: '#595959'
+                        },
+                        type: 'category',
+                        data: chart_data.days,
+                        axisLine: {
+                            lineStyle: {
+                                color: '#E0E0E0'
+                            },
+                            symbol: ['none', 'arrow'],
+                            symbolOffset: [0, 10]
+                        },
+                        axisLabel: {
+                            color: '#8c8c8c',
+                            interval: function (index, value) {
+                                return true;
+                            }
+                        },
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    },
+                    yAxis: {
+                        name: '访问量（次）',
+                        nameTextStyle: {
+                            color: '#595959'
+                        },
+                        type: 'value',
+                        boundaryGap: ['0', '20%'],
+                        axisTick: {
+                            show: false
+                        },
+                        axisLine: {
+                            lineStyle: {
+                                color: '#E0E0E0'
+                            },
+                            symbol: ['none', 'arrow'],
+                            symbolOffset: [0, 10]
+                        },
+                        axisLabel: {
+                            color: '#8c8c8c'
+                        },
+                        splitLine: {
+                            show: false
+                        },
+                        splitArea: {
+                            show: false
+                        },
+                        minInterval: 1
+                    },
+                    series: [
+                        {
+                            name: '访问量',
+                            type: 'line',
+                            smooth: false
+                        }
+                    ]
+                };
+                ncovCharts.setOption(ncov_options);
+                
+                // 赋值
+                ncovCharts.setOption({
+                    series: [
+                        {data: chart_data.total}
+                    ]
+                });
+            }
+
+            function cityTotalHtml(citys) {
+                var html = "";
+
+                for (var i = 0; i<citys.length; i++) {
+                    if(citys[i].city == null) {
+                        name = '未知';
+                    } else {
+                        name = citys[i].city;
+                    }
+
+                    total = citys[i].total;
+                    html += '<div class="layui-col-xs3 layui-col-sm2 layui-col-md1"><div class="layui-card"><div class="layui-card-header">' + name + '</div><div class="layui-card-body"><p class="lay-big-font">' + total + '</p></div></div></div>'
+                }
+
+               return html;
+            }
+        });
+    </script>

@@ -1,0 +1,416 @@
+<link rel="stylesheet" href="assets/module/formSelects/formSelects-v4.css"/>
+<style>
+    .layui-table .layui-table-cell{
+        height:55px;
+        line-height: 55px;
+    }
+</style>
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-tab" lay-filter="test">
+                <ul class="layui-tab-title">
+                    <li class="layui-this" lay-id="0">未入库</li>
+                    <li lay-id="2">已入库</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <table class="layui-table" id="noGoods" lay-filter="noGoods">
+                            <div class="layui-form toolbar">
+                                <div class="layui-form-item">
+                                    <div class="layui-inline">
+                                        <button v="0" class="layui-btn layui-btn-sm layui-btn-radius  layui-btn-primary upStatus">未审核</button>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button v="1"  class="layui-btn layui-btn-sm layui-btn-radius  layui-btn-primary upStatus">审核中</button>
+                                    </div>
+                                    <div class="layui-inline">
+                                        <button v="3"  class="layui-btn layui-btn-sm layui-btn-radius  layui-btn-primary upStatus">审核未通过</button>
+                                    </div>
+<!--                                    <div class="layui-inline">-->
+<!--                                        <button id="goodsAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加商品</button>-->
+<!--                                    </div>-->
+                                </div>
+                            </div>
+                        </table>
+                    </div>
+                    <div class="layui-tab-item">
+                        <table class="layui-table" id="goods" lay-filter="noGoods"></table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="userTableBar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<script type="text/html" id="price1">
+    <div class="layui-inline">
+        <label class="layui-form-label">价格</label>
+        <div class="layui-input-inline">
+            <input type="number" name="price" lay-verify="price" placeholder="0.00" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+</script>
+<script type="text/html" id="price2">
+    <div class="layui-inline">
+        <label class="layui-form-label">价格</label>
+        <div class="layui-input-inline">
+            <input type="number" name="price" lay-verify="price" placeholder="0.00" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <div class="layui-input-inline">
+            <input type="number" name="price2" lay-verify="price" placeholder="0.00" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+</script>
+
+<script  type="text/html" id="price3">
+
+    <div class="layui-inline">
+        <label class="layui-form-label">价格</label>
+        <div class="layui-input-inline">
+        <input type="number" name="price" lay-verify="price" placeholder="0.00" autocomplete="off" class="layui-input">
+        </div>
+        </div>
+        <div class="layui-inline">
+        <label class="layui-form-label">现价</label>
+        <div class="layui-input-inline">
+        <input type="number" name="price2" lay-verify="price" placeholder="0.00" autocomplete="off" class="layui-input">
+        </div>
+        </div>
+</script>
+<!-- 表格状态列 -->
+<script type="text/html" id="modelLive">
+    <div class="layui-tab" >
+        <div class="layui-tab-content">
+
+            <form id="liveForm" lay-filter="liveForm" class="layui-form model-form">
+                <input name="id" type="hidden"/>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span style="color: red;">*</span>商品封面图</label>
+                    <div class="layui-input-inline upfile_btn">
+                        <button type="button" class="layui-btn upfile_btn" id="upload_logo_image"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+                    </div>
+                    <div class="layui-input-inline">
+                        <div class="img_tip_content">最大尺寸：300像素 * 300像素，图片大小不得超过80K</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">预览图</label>
+                    <div class="layui-input-block">
+                        <div class="layui-upload-list layui-upload-imgs" >
+                            <img class="layui-upload-img" style="width: 92px;height: 92px" id="layui-upload-logo-img">
+                            <i class="layui-icon layui-icon-close-fill" style="display: none"></i>
+                            <input type="hidden" name="coverImgUrl">
+                            <input type="hidden" name="coverImg">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span style="color: red;">*</span>商品名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="name" placeholder="请输入商品名称" value="" lay-verType="tips" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span style="color: red;">*</span>价格形式</label>
+                    <div class="layui-input-block">
+                        <select name="priceType" lay-filter="college">
+                            <option value="1">一口价</option>
+                            <option value="2">价格区间</option>
+                            <option value="3">折扣价</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item priceItem" >
+                    <div class="layui-inline">
+                        <label class="layui-form-label">价格</label>
+                        <div class="layui-input-inline">
+                            <input type="number" name="price" lay-verify="price" placeholder="0.00" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item buyway1_show">
+                    <label class="layui-form-label"><span style="color: red;">*</span>商品链接</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="url" placeholder="商品详情页的小程序路径，路径参数存在 url 的，该参数的值需要进行 encode 处理再填入" value=""
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item text-right">
+                    <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+                    <button id="btnSave" class="layui-btn" lay-filter="modelAuthSubmit" lay-submit>提交审核</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+
+<script>
+    layui.use(['layer', 'table', 'form', 'util', 'config', 'admin','layedit','upload','uploadst','laydate'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var upload = layui.upload;
+        var uploadst = layui.uploadst;
+        var form = layui.form;
+        var util = layui.util;
+        var config = layui.config;
+        var admin = layui.admin;
+        var layedit = layui.layedit;
+        var laydate = layui.laydate;
+        var element = layui.element;
+
+        // 渲染表格
+        var insTb = table.render({
+            elem: '#noGoods',
+            url: config.base_server + 'goodsHouse/list',
+            method: 'post',
+            where: {
+                // access_token: config.getToken().access_token
+            },
+            headers: {
+                'Authorization': 'Bearer ' + config.getToken().access_token
+            },
+            page: true,
+            limit:30,
+            cellMinWidth: 100,
+            cols: [[
+                {
+                    title: '基本信息', width: 200, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.cover_img_url != "")
+                            str = '<img src="'+ d.cover_img_url +'" class="table_img"><span>'+d.name+'</span>';
+                        return str;
+                    }
+                },
+                {field: 'price', title: '价格'},
+                {field: 'url', title: '链接'},
+                {field: 'status_str', title: '状态'},
+                {align: 'center', templet: function (d) {
+                        var str = '';
+                        if(d.audit_status==0){
+                            str = '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="audit">提交审核</a>'
+                            +'<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">编辑</a>'
+                            +'<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="del">删除</a>'
+                        }else{
+                            str = '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="restaudit">撤回审核</a>'
+                                +'<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="del">删除</a>'
+                        }
+                        return str;
+                    }, title: '操作', minWidth: 200}
+            ]],
+            done: function(res, curr, count){
+                if(!admin.hasPerm('system:user:reset')){
+                    $("a[lay-event='reset']").remove();
+                }
+                $('.table_img').on('click', function () {
+                    var img = $(this).attr('src');
+                    layer.photos({
+                        photos: { "data": [{"src": img}]}
+                        ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+                    });
+                })
+            }
+        });
+        var insTb2 = table.render({
+            elem: '#goods',
+            url: config.base_server + 'goodsHouse/list',
+            method: 'post',
+            where: {
+                status: 2
+            },
+            headers: {
+                'Authorization': 'Bearer ' + config.getToken().access_token
+            },
+            page: true,
+            limit:30,
+            cellMinWidth: 100,
+            cols: [[
+                {
+                    title: '基本信息', width: 200, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.cover_img_url != "")
+                            str = '<img src="'+ d.cover_img_url +'" class="table_img"><span>'+d.name+'</span>';
+                        return str;
+                    }
+                },
+                {field: 'price', title: '价格'},
+                {field: 'url', title: '链接'},
+                {field: 'status_str', title: '状态'},
+                {align: 'center', toolbar: '#userTableBar', title: '操作', minWidth: 200}
+            ]],
+            done: function(res, curr, count){
+                if(!admin.hasPerm('system:user:reset')){
+                    $("a[lay-event='reset']").remove();
+                }
+            }
+        });
+
+        // $('#goodsAdd').click(function () {
+        //     showEditModel();
+        // });
+
+        // 搜索按钮点击事件
+        $('#userBtnSearch').click(function () {
+            var value = $('#userEdtSearch').val();
+            var type = $('#type').val();
+            var status = $('#status').val();
+            insTb.reload({where: {search: value, type: type, status: status}});
+        });
+
+        $('.upStatus').click(function () {
+
+            insTb.reload({where: {status: $(this).attr('v')}});
+        })
+
+        // 工具条点击事件
+        table.on('tool(noGoods)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if(layEvent === 'audit'){
+                layer.confirm('审核大约需要1-7天，确定提交审核吗？', {
+                    skin: 'layui-layer-admin'
+                }, function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('goodsHouse/audit', {
+                        id: data.goods_id,
+                    }, function (res) {
+                        layer.closeAll('loading');
+                        if (res.code == 200) {
+                            layer.msg(res.msg, {icon: 1});
+                            insTb.reload();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }, 'post');
+                });
+            }else if(layEvent === 'edit'){
+                showEditModel(data);
+            }else if(layEvent === 'restaudit'){
+                layer.confirm('确定要撤回审核吗？', {
+                    skin: 'layui-layer-admin'
+                }, function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('goodsHouse/restaudit', {
+                        id: data.goods_id,
+                        status: data.audit_status,
+                    }, function (res) {
+                        layer.closeAll('loading');
+                        if (res.code == 200) {
+                            layer.msg(res.msg, {icon: 1});
+                            insTb.reload();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }, 'post');
+                });
+            } else if (layEvent === 'del') {  // 删除
+                layer.confirm('确定要删除吗？', {
+                    skin: 'layui-layer-admin'
+                }, function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('goodsHouse/delete', {
+                        status: data.audit_status,
+                        id: data.goods_id
+                    }, function (res) {
+                        layer.closeAll('loading');
+                        if (res.code == 200) {
+                            layer.msg(res.msg, {icon: 1});
+                            insTb.reload();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }, 'post');
+                });
+            }
+        });
+
+        function showEditModel(data) {
+            admin.open({
+                type: 1,
+                title: (data ? '修改' : '添加') + '商品',
+                area: ['1200px', '820px'],
+                content: $('#modelLive').html(),
+                success: function (layero, dIndex) {
+                    $('#price2').css('display','none');
+                    $('#price3').css('display','none');
+                    form.on('select(college)', function (data) {
+                        $('.priceItem').html($('#price'+data.value).html());
+                    });
+
+                    var url = data ? 'goodsHouse/update' : 'goodsHouse/save';
+                    if(data){
+                        // 回显数据
+                        $('#layui-upload-logo-img').attr('src', data.cover_img_url);
+                        $("input[name='name']").val([data.name]);
+                        $("input[name='id']").val([data.goods_id]);
+                        $("input[name='price']").val([data.price]);
+                        $("input[name='url']").val([data.url]);
+                        $("select[name='status']").val([data.status]);
+                        form.val('modelUserForm', data);
+                    }else{
+                        form.render('radio');
+                    }
+                    form.render('select');
+                    //日期时间选择器
+                    laydate.render({
+                        elem: '#date'
+                        ,type: 'datetime'
+                        ,format: 'yyyy-MM-dd HH:mm:ss'
+                    });
+                    laydate.render({
+                        elem: '#date2'
+                        ,type: 'datetime'
+                        ,format: 'yyyy-MM-dd HH:mm:ss'
+                    });
+
+                    //上传封面图
+                    var options = {
+                        elem: "#upload_logo_image",
+                        previewEle: "#layui-upload-logo-img",
+                        url:config.base_server+'uploade/wechatGoodsImage'
+                    };
+                    uploadst.uploadGoodsWechatImg(options);
+
+
+                    var index = layedit.build('content', {height: 200});
+
+                    // 表单提交事件
+                    form.on('submit(modelAuthSubmit)', function (data) {
+                        var load = layer.load();
+                        admin.req(url, data.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.close(dIndex);
+                                layer.msg(res.msg, {icon: 1});
+                                insTb.reload();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'post');
+                        return false;
+                    });
+
+                }
+            });
+        }
+    });
+
+
+</script>
