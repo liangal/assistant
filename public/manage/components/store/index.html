@@ -1,0 +1,606 @@
+<link rel="stylesheet" href="assets/module/formSelects/formSelects-v4.css"/>
+<style>
+    .layui-table-cell{height: auto;}
+    #container{
+        /*地图(容器)显示大小*/
+        width:1032px;
+        height:400px;
+    }
+</style>
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body" id="layPhotosTbImg">
+            <div class="layui-form toolbar">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <input id="userEdtSearch" class="layui-input" type="text" placeholder="商品名称"/>
+                    </div>
+                    <div class="layui-inline">
+                        <select id="category_id">
+                            <option value="">商品分类</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <select name="status" id="status">
+                            <option value="">状态</option>
+                            <option value="1">上架</option>
+                            <option value="0">下架</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">上架时间</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="date" id="date" lay-verify="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type="text" name="date2" id=  "date2" lay-verify="date2" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="companyBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索
+                        </button>
+                        <button id="companyBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="layui-table" id="userTable" lay-filter="userTable"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="userTableBar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<!-- 表单弹窗 -->
+<script type="text/html" id="modelUser" >
+    <div class="layui-tab">
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <form id="modelUserForm" lay-filter="modelUserForm" class="layui-form model-form">
+                    <input name="id" type="hidden"/>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>logo</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="logo" required lay-verify="required" placeholder="图片地址"  class="layui-input">
+                        </div>
+                        <div class="layui-input-inline upfile_btn">
+                            <button type="button" class="layui-btn layui-input-inline upfile_btn" autocomplete="off" id="upload_logo_image"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+                        </div>
+                        <div class="layui-input-inline">
+                            <div class="img_tip_content">建议尺寸：750像素 * 750像素；</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">预览图</label>
+                        <div class="layui-input-block">
+                            <div class="layui-upload-list layui-upload-imgs" id="layui-upload_logo">
+                                <ul>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>店铺名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="title" placeholder="请输入商品名称,最多40个字" value="" required lay-verify="required"class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item buyway1_show">
+                        <label class="layui-form-label"><span style="color: red;">*</span>电话号码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="mobile"  value=""
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>店铺地址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="address" placeholder="address" value="" required lay-verify="required" class="layui-input">
+                            <button id="taddress" type="button" class="layui-btn" >查询</button>
+                        </div>
+                        <div class="layui-input-block" id="container">
+
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>类型</label>
+                        <div class="layui-input-block">
+                            <select name="type"  lay-verType="tips" lay-verify="required">
+                                <option value="1">美团</option>
+                                <option value="2">饿了么</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>商家</label>
+                        <div class="layui-input-block">
+                            <select name="uid"  lay-verType="tips" id="user" lay-verify="required">
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>二维码截图</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="code" required lay-verify="required" placeholder="图片地址"  class="layui-input">
+                        </div>
+                        <div class="layui-input-inline upfile_btn">
+                            <button type="button" class="layui-btn layui-input-inline upfile_btn" autocomplete="off" id="upload_code_image"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+                        </div>
+                        <div class="layui-input-inline">
+                            <div class="img_tip_content">建议尺寸：750像素 * 750像素；</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">预览图</label>
+                        <div class="layui-input-block">
+                            <div class="layui-upload-list layui-upload-imgs" id="layui-upload_code">
+                                <ul>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>地址截图</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="address_img" required lay-verify="required" placeholder="图片地址"  class="layui-input">
+                        </div>
+                        <div class="layui-input-inline upfile_btn">
+                            <button type="button" class="layui-btn layui-input-inline upfile_btn" autocomplete="off" id="upload_address_image"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+                        </div>
+                        <div class="layui-input-inline">
+                            <div class="img_tip_content">建议尺寸：750像素 * 750像素；</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">预览图</label>
+                        <div class="layui-input-block">
+                            <div class="layui-upload-list layui-upload-imgs" id="layui-upload_address">
+                                <ul>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label"><span style="color: red;">*</span>菜品图片</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="dishes_img" required lay-verify="required" placeholder="图片地址"  class="layui-input">
+                        </div>
+                        <div class="layui-input-inline upfile_btn">
+                            <button type="button" class="layui-btn layui-input-inline upfile_btn" autocomplete="off" id="upload_thumbs_image"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+                        </div>
+                        <div class="layui-input-inline">
+                            <div class="img_tip_content">建议尺寸：750像素 * 750像素；</div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">预览图</label>
+                        <div class="layui-input-block">
+                            <div class="layui-upload-list layui-upload-imgs" id="layui-upload-thumbs">
+                                <ul>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="status" value="1" title="上架" checked>
+                            <input type="radio" name="status" value="0" title="下架" >
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item text-right">
+                        <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+                        <button id="btnSave" class="layui-btn" lay-filter="modelAuthSubmit" lay-submit>提交保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</script>
+
+<script>
+
+
+    layui.use(['layer', 'table', 'form', 'layedit', 'config','treetable', 'admin', 'alioss','uploadst','element','laydate'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var form = layui.form;
+        var layedit = layui.layedit;
+        var config = layui.config;
+        var admin = layui.admin;
+        var user = "";
+        var laydate = layui.laydate;
+        var alioss = layui.alioss;
+        var uploadst = layui.uploadst;
+        // 渲染laydate
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date2'
+        });
+
+
+        var insTb = table.render({
+            url: config.base_server + 'store/index',
+            method: 'post',
+            treeColIndex: 1,
+            treeSpid: 0,
+            headers: {
+                'Authorization': 'Bearer ' + config.getToken().access_token
+            },
+            elem: '#userTable',
+            cellMinWidth: 100,
+            page: true,
+            cols: [[
+                {type: 'numbers',width: 100, title: 'ID'},
+                {field: 'title', title: '店铺名称'},
+                {field: 'user_name', title: '商户名称'},
+                {field: 'type_name', title: '店铺类型'},
+                {field: 'mobile', title: '电话号码'},
+                {field: 'title', title: '商户名称'},
+                {
+                    title: 'logo', width: 300, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.oss_logo != ""){
+                            str += '<img src="'+ d.oss_logo +'" class="table_img">';
+                        }
+
+                        return str;
+                    }
+                },
+                {
+                    title: '地址截图', width: 300, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.oss_address_img != ""){
+                            str += '<img src="'+ d.oss_address_img +'" class="table_img">';
+                        }
+
+                        return str;
+                    }
+                },
+                {
+                    title: '菜品截图', width: 300, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.oss_dishes_img != ""){
+                            str += '<img src="'+ d.oss_dishes_img +'" class="table_img">';
+                        }
+
+                        return str;
+                    }
+                },
+                {
+                    title: '二维码', width: 300, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.oss_code != ""){
+                            str += '<img src="'+ d.oss_code +'" class="table_img">';
+                        }
+
+                        return str;
+                    }
+                },
+                {
+                    title: '显示状态', templet: function (d) {
+                        var str = "  <a class=\"layui-btn layui-btn-primary layui-btn-xs\" lay-event=\"upStatus\">"+d.status_str+"</a>";
+                        return str;
+                    }, align: 'center'
+                },
+                {templet: '#userTableBar', title: '操作', align: 'center', minWidth: 100}
+            ]],
+            done: function(res, curr, count){
+                if(!admin.hasPerm('content:goods:save')){
+                    $("a[lay-event='edit']").remove();
+                }
+                if(!admin.hasPerm('content:goods:delete')){
+                    $("a[lay-event='del']").remove();
+                }
+
+                $('.table_img').on('click', function () {
+                    var img = $(this).attr('src');
+                    layer.photos({
+                        photos: { "data": [{"src": img}]}
+                        ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+                    });
+                })
+            }
+        });
+
+        //规格start
+        window.specNumber = 1,imgNumber = 1;
+        //规格end
+
+        setTimeout(function(){
+            form.render('select');
+        }, 1000);
+
+        // 搜索按钮点击事件
+        $('#companyBtnSearch').click(function () {
+            var value = $('#userEdtSearch').val();
+            var category_id = $('#category_id').val();
+            var status = $('#status').val();
+            var data = $('#date').val();
+            var data2 = $('#date2').val();
+
+            insTb.reload({where: {title: value,category_id:category_id,status:status,start_at:data,end_at:data2}});
+        });
+
+        // 添加按钮点击事件
+        if(!admin.hasPerm('content:goods:save')){
+            $("#companyBtnAdd").remove();
+        }
+        else
+        {
+            $('#companyBtnAdd').click(function () {
+                showEditModel();
+            });
+        }
+
+
+        // 工具条点击事件
+        table.on('tool(userTable)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if(layEvent === 'upStatus'){
+                var status =(data.status==1)?0:1;
+                admin.req('content/goods/upStatus', {
+                    id: data.id,
+                    status: status
+                }, function (res) {
+                    layer.closeAll('loading');
+                    if (res.code == 200) {
+                        layer.msg(res.msg, {icon: 1});
+                        insTb.reload();
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, 'post');
+            }else if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            } else if (layEvent === 'del') {  // 删除
+                layer.confirm('确定要删除吗？', {
+                    skin: 'layui-layer-admin'
+                }, function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('content/goods/delete', {
+                        id: data.id
+                    }, function (res) {
+                        layer.closeAll('loading');
+                        if (res.code == 200) {
+                            layer.msg(res.msg, {icon: 1});
+                            insTb.reload();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }, 'post');
+                });
+            }
+        });
+
+        // 显示表单弹窗
+        function    showEditModel(data) {
+            admin.open({
+                type: 1,
+                title: (data ? '修改' : '添加') + '店铺',
+                area: ['1200px', '820px'],
+                content: $('#modelUser').html(),
+                success: function (layero, dIndex) {
+                    alioss.vals = '';
+                    if(!admin.hasPerm('store:create') && !admin.hasPerm('store:update')){
+                        $("#btnSave").remove();
+                    }
+
+                    var url = data ? 'store/update' : 'store/create';
+                    var thumbs ='';
+
+                    //地图---start
+                        var center = new TMap.LatLng(39.980348322221694, 116.31315861457483)
+                        //定义map变量，调用 TMap.Map() 构造函数创建地图
+                        var map = new TMap.Map(document.getElementById('container'), {
+                            center: center,//设置地图中心点坐标
+                            zoom: 17.2,   //设置地图缩放级别
+                            pitch: 43.5,  //设置俯仰角
+                            rotation: 45,    //设置地图旋转角度
+                        });
+                        var marker = new TMap.MultiMarker({
+                            map: map,
+                            styles: {
+                                // 点标记样式
+                                "myStyle": new TMap.MarkerStyle({
+                                    width: 5, // 样式宽
+                                    height: 10, // 样式高
+                                    // anchor: { x: 10, y: 30 }, // 描点位置
+                                    src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/markerDefault.png', // 标记路径
+                                }),
+                            },
+                            geometries: [
+                                // 点标记数据数组
+                                {
+                                    "id": "1",   //点标记唯一标识，后续如果有删除、修改位置等操作，都需要此id
+                                    // "styleId": 'myStyle',  //指定样式id
+                                    // 标记位置(经度，纬度，高度)
+                                    position: center,
+                                },
+                            ],
+                        });
+                        //初始化marker图层
+                        var markerLayer = new TMap.MultiMarker({
+                            id: 'marker-layer',
+                            map: map
+                        });
+                        //监听点击事件添加marker
+                        map.on("click", (evt) => {
+                            var lat = evt.latLng.getLat().toFixed(6);
+                            var lng = evt.latLng.getLng().toFixed(6);
+
+                            console.log("您点击的的坐标是："+ lat + "," + lng);
+                            marker.geometries.setposition =evt.latLng;
+
+                            marker.updateGeometries([
+                                {
+                                    // "styleId":"myStyle",
+                                    "id": "1",
+                                    "position": evt.latLng,
+                                }
+                            ])
+                        });
+
+                        var centerLatLng=map.getCenter();
+                        // var clickHandler=function(evt){//获取坐标
+                        //     var lat = evt.latLng.getLat().toFixed(6);
+                        //     var lng = evt.latLng.getLng().toFixed(6);
+                        //     console.log("您点击的的坐标是："+ lat + "," + lng);
+                        // }
+                        // map.on("click",clickHandler)
+
+                        var geocoder = new TMap.service.Geocoder(); // 新建一个正逆地址解析类
+
+                        $('#taddress').on('click',function () {
+                            geocoder.keyCode = 'hxQMaGyHSV9ktppsbnyecW8RP5ihHRZ';
+                            geocoder.getLocation({ address: $("input[name='address']").val() })
+                                .then((result) => {
+                                    marker.updateGeometries([
+                                        {
+                                            "id": "1",
+                                            "position": result.result.location, // 将得到的坐标位置用点标记标注在地图上
+                                        },
+                                    ]);
+                                    map.setCenter(result.result.location);
+                                    console.log($("input[name='keyword']").val());
+                                    // document.getElementById(
+                                    //     'location'
+                                    // ).value = result.result.location.toString();
+                                    // 显示坐标数值
+                                });
+                        })
+
+                    //地图---end
+                    admin.req('system/user/list', {}, function (res) {
+                        $.each(res.data,function (i,e) {
+                            $('#user').append(' <option value="'+e.id+'">'+e.nickname+'</option>') ;
+                        })
+                        form.render();
+                        // $('#user')
+                    }, 'post');
+                    console.log(data);
+                    if(data){
+
+
+                        if(data.logo.length>0) {
+                            $("#layui-upload_logo ul").append('<li><img src="'+ data.oss_logo +'" data-path="'+data.logo +'"><i class="layui-icon layui-icon-close-fill"></i></li>');
+                        }
+                        if(data.code.length>0) {
+                            $("#layui-upload_code ul").append('<li><img src="'+ data.oss_code +'" data-path="'+data.code +'"><i class="layui-icon layui-icon-close-fill"></i></li>');
+                        }
+                        if(data.oss_address_img.length>0) {
+                            $("#layui-upload_address ul").append('<li><img src="'+ data.oss_address_img +'" data-path="'+data.address_img +'"><i class="layui-icon layui-icon-close-fill"></i></li>');
+                        }
+                        if(data.oss_dishes_img.length>0) {
+                            $("#layui-upload-thumbs ul").append('<li><img src="'+ data.oss_dishes_img +'" data-path="'+data.dishes_img +'"><i class="layui-icon layui-icon-close-fill"></i></li>');
+                        }
+                        console.log(data.title);
+                        // 回显数据
+                        $("input[name='title']").val([data.title]);
+                        $("input[name='goods_id']").val([data.id]);
+                        $("input[name='subtitle']").val([data.subtitle]);
+                        $("input[name='unit']").val([data.unit]);
+                        $("input[name='keyword']").val([data.keyword]);
+                        $("input[name='productprice']").val([data.productprice]);
+                        $("input[name='marketprice']").val([data.marketprice]);
+                        $("input[name='ficti_num']").val([data.ficti_num]);
+                        $("input[name='stock']").val([data.stock]);
+                        if ( data.status == '0') {
+                            $('input[name="status"][value="0"]').prop("checked", true);
+                        }
+                        form.val('modelUserForm', data);
+                        $("#content").val(data.description);
+
+                    }else{
+                        form.render('radio');
+                        form.render('select');
+                    }
+
+                    //上传封面图
+                    var options = {
+                        elem: "#upload_image",
+                        previewEle: "#layui-upload-imgs",
+                        url:config.base_server+'uploade/wechatGoodsImage'
+                    };
+                    uploadst.uploadGoodsWechatImg(options);
+
+                    //logo
+                    var option3 = {
+                        previewEle: "#layui-upload_logo ul",
+                        elem: "#upload_logo_image",
+                    };
+
+                    alioss.initUpload(option3);
+
+                    //二维码
+                    var option4 = {
+                        previewEle: "#layui-upload_code ul",
+                        elem: "#upload_code_image",
+                    };
+
+                    alioss.initUpload(option4);
+
+                    //菜品
+                    var option5 = {
+                        previewEle: "#layui-upload_address ul",
+                        elem: "#upload_address_image",
+                    };
+
+                    alioss.initUpload(option5);
+
+                    //轮播图
+                    var option2 = {
+                        previewEle: "#layui-upload-thumbs ul",
+                        elem: "#upload_thumbs_image",
+                    };
+                    alioss.initUpload(option2);
+
+                    console.log(data);
+                    // 表单提交事件
+                    form.on('submit(modelAuthSubmit)', function (data) {
+                        admin.req(url, data.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.close(dIndex);
+                                layer.msg(res.msg, {icon: 1});
+                                // parent.location.reload();
+                                insTb.reload();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'post');
+                        return false;
+                    });
+
+                }
+            });
+        };
+    });
+</script>

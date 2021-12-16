@@ -1,0 +1,134 @@
+<style>
+    body,html,#container{width: 100%;height: 100%;margin: 0px}
+    .content-window-card {position: relative;box-shadow: none;bottom: 0;left: 0;width: auto;padding: 0;}
+    .content-window-card p {height: 2rem;}
+    .custom-info {border: solid 1px silver;}
+    div.info-top {position: relative; background: none repeat scroll 0 0 #F9F9F9;border-bottom: 1px solid #CCC;border-radius: 5px 5px 0 0;}
+    div.info-top div {display: inline-block;color: #333333;font-size: 14px;font-weight: bold;line-height: 31px;padding: 0 10px;}
+    div.info-top img {position: absolute;top: 10px; right: 10px; transition-duration: 0.25s;}
+    div.info-top img:hover {box-shadow: 0px 0px 5px #000;}
+    div.info-middle {font-size: 12px;padding: 10px 6px;line-height: 20px; min-height: 100px;}
+    div.info-bottom {height: 0px;width: 100%;clear: both;text-align: center;}
+    div.info-bottom img {position: relative;z-index: 104;}
+    span {margin-left: 5px;font-size: 11px;}
+    .info-middle img {float: left;margin-right: 6px;}
+    .amap-icon {border-radius: 25px; border: solid #fff 2px ;}
+</style> 
+<div id="container"></div>
+<script type="text/javascript">
+layui.use(['layer', 'util', 'config', 'admin'], function () {        
+    var $ = layui.jquery;
+    var layer = layui.layer;
+    var util = layui.util;
+    var config = layui.config;
+    var admin = layui.admin;
+
+    var map = new AMap.Map('container', {
+        resizeEnable: true,
+        center:[110.169264,19.969324],
+        zoom:15
+    });
+
+    //使用自定义窗体
+    var infoWindow = new AMap.InfoWindow({
+        isCustom: true,  
+        offset: new AMap.Pixel(24, -50)
+    });
+
+    function getPersonnelList() {
+        admin.req('security/personnel/list', {}, function (res) {
+            if (res.code == 0) {
+                var data = res.data;
+                addMarker(data);
+            } else {
+                layer.msg(res.msg, {icon: 2});
+            }
+        }, 'post');
+    }
+
+    getPersonnelList();
+    
+    //添加marker标记
+    function addMarker(data) {
+        map.clearMap();
+        for (var i = 0; i < data.length; i++) {
+            var personnel = data[i];
+            if(personnel.latilong != "" && personnel.latilong != null) {
+                var latilong = personnel.latilong.split(',');
+                var marker = new AMap.Marker({
+                    map: map,
+                    position: latilong  
+                });
+                
+                if(personnel.avatar != "" && personnel.avatar != null) {
+                    var icon = new AMap.Icon({image: personnel.avatar,size: new AMap.Size(50, 50),imageSize: new AMap.Size(50,50)});
+                    marker.setIcon(icon);
+                }
+                
+                marker.personnel = personnel;
+                marker.on('click', markerClick);
+            }           
+        }
+    }
+
+    // 鼠标点击marker弹出自定义的信息窗体
+    function markerClick(e) {
+        var personnel = e.target.personnel;
+        var title = personnel.name + "基本信息";
+        var content = [];
+        content.push("<img src='" + personnel.avatar + "' width='100' height='100'> 姓名：" + personnel.name);
+        content.push("性别：" + personnel.sex);
+        content.push("电话：" + personnel.phone);
+        content.push("巡逻区域：" + personnel.patrol_area);               
+        
+        var info = createInfoWindow(title, content.join("<br/>"));
+        infoWindow.setContent(info);
+        infoWindow.open(map, e.target.getPosition());
+    }
+
+    //构建自定义信息窗体
+    function createInfoWindow(title, content) {
+        var info = document.createElement("div");
+        info.className = "custom-info input-card content-window-card";
+
+        //可以通过下面的方式修改自定义窗体的宽高
+        info.style.width = "300px";
+        // 定义顶部标题
+        var top = document.createElement("div");
+        var titleD = document.createElement("div");
+        var closeX = document.createElement("img");
+        top.className = "info-top";
+        titleD.innerHTML = title;
+        closeX.src = "https://webapi.amap.com/images/close2.gif";
+        closeX.onclick = closeInfoWindow;
+
+        top.appendChild(titleD);
+        top.appendChild(closeX);
+        info.appendChild(top);
+
+        // 定义中部内容
+        var middle = document.createElement("div");
+        middle.className = "info-middle";
+        middle.style.backgroundColor = 'white';
+        middle.innerHTML = content;
+        info.appendChild(middle);
+
+        // 定义底部内容
+        var bottom = document.createElement("div");
+        bottom.className = "info-bottom";
+        bottom.style.position = 'relative';
+        bottom.style.top = '0px';
+        bottom.style.margin = '0 auto';
+        var sharp = document.createElement("img");
+        sharp.src = "https://webapi.amap.com/images/sharp.png";
+        bottom.appendChild(sharp);
+        info.appendChild(bottom);
+        return info;
+    }
+
+    //关闭信息窗体
+    function closeInfoWindow() {
+        map.clearInfoWindow();
+    }
+});
+</script>

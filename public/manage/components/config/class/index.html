@@ -1,0 +1,321 @@
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form toolbar">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label w-auto">搜索：</label>
+                        <div class="layui-input-inline mr0">
+                            <input id="authEdtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="authBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索
+                        </button>
+                        <button id="BtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+                        <button id="btnExpand" class="layui-btn icon-btn">全部展开</button>
+                        <button id="btnFold" class="layui-btn icon-btn">全部折叠</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="layui-table" id="authTable" lay-filter="authTable"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 表单弹窗 -->
+<script type="text/html" id="modelAuth">
+    <form id="modelForm" lay-filter="modelForm" class="layui-form model-form">
+        <input name="id" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">上级菜单</label>
+            <div class="layui-input-block">
+                <select id="parent_id" name="parent_id">
+                    <option value="">请选择上级菜单</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类名称</label>
+            <div class="layui-input-block">
+                <input name="name" placeholder="请输入分类名称" type="text" class="layui-input" maxlength="50"
+                       lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">短名称</label>
+            <div class="layui-input-block">
+                <input name="short_name" placeholder="请输入短名称" type="text" class="layui-input" maxlength="50"
+                       lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">首字母</label>
+            <div class="layui-input-block">
+                <input name="initials" placeholder="请输入首字母" type="text" class="layui-input" maxlength="1"
+                       lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分类标识</label>
+            <div class="layui-input-block">
+                <input name="code" placeholder="请输入分类标识" type="text" class="layui-input" lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序号</label>
+            <div class="layui-input-block">
+                <input name="sort" value="100" placeholder="请输入排序号" type="number" class="layui-input" min="0" max="1000"
+                       lay-verType="tips" lay-verify="required|number" required/>
+            </div>
+        </div>
+        <div class="layui-form-item text-right">
+            <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+            <button id="btnSave" class="layui-btn" lay-filter="modelAuthSubmit" lay-submit>保存</button>
+        </div>
+    </form>
+</script>
+<!-- js部分 -->
+<script>
+    layui.use(['layer', 'table', 'admin', 'config', 'treetable', 'form'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var admin = layui.admin;
+        var config = layui.config;
+        var treetable = layui.treetable;
+        var form = layui.form;
+        
+        var cagegorys = "";
+        
+        function loadAuthData() {
+            $.ajax({
+                url: config.base_server + 'config/class/list',
+                headers: {
+                    'Authorization': 'Bearer ' + config.getToken().access_token 
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(res){
+                    cagegorys = res.data.cagegorys;
+                    renderAuthTable(res.data.list);
+                }
+            })
+        }
+
+        // 渲染表格
+        function renderAuthTable(data) {
+            treetable.render({
+                data:data,
+                treeColIndex: 1,
+                treeSpid: 0,
+                treeIdName: 'id',
+                treePidName: 'parent_id',
+                elem: '#authTable',
+                cellMinWidth: 100,
+                cols: [[
+                    {type: 'numbers'},
+                    {field: 'name', title: '分类名称'},
+                    {field: 'short_name', title: '短名称', align: 'center', width: 150},
+                    {field: 'initials', title: '首字母', align: 'center', width: 100},
+                    {field: 'code', title: '分类标识', align: 'center', width: 180},
+                    {field: 'sort', title: '排序号', align: 'center', width: 100},
+                    {
+                        title: '推荐', align: 'center', width: 80, templet: function (d) {
+                            var str = "";
+
+                            if(d.system_reserved == 0) {
+                                if(d.recommend == 2) {
+                                    str = '<input type="checkbox" lay-filter="userTableRecommend" value="' + d.id + '" lay-skin="switch" lay-text="是|否" checked />';
+                                }
+                                else
+                                {
+                                    str = '<input type="checkbox" lay-filter="userTableRecommend" value="' + d.id + '" lay-skin="switch" lay-text="是|否" />';
+                                }
+                            }
+
+                            return str;
+                        }
+                    },
+                    {
+                        title: '操作', align: 'center', width: 120, templet: function (d) {
+                            var str = "";
+                            
+                            if(d.system_reserved == 0) {
+                                str = '<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>';
+                            }
+                            
+                            return str;
+                        }
+                    }
+                ]],
+                done: function(res, curr, count){
+                    if(!admin.hasPerm('config:class:edit')){
+                        $("a[lay-event='edit']").remove();
+                    }
+                    if(!admin.hasPerm('config:class:delete')){
+                        $("a[lay-event='del']").remove();
+                    }
+                }
+            });
+        }
+
+        loadAuthData();
+
+        // 添加按钮点击事件
+        if(!admin.hasPerm('config:class:create')){
+            $("#BtnAdd").remove();
+        }
+        else
+        {
+            $('#BtnAdd').click(function () {
+                showEditModel();
+            });
+        }
+
+        // 工具条点击事件
+        table.on('tool(authTable)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            } else if (layEvent === 'del') { // 删除
+                doDelete(obj.data.id);
+            }
+        });
+
+        // 删除
+        function doDelete(id) {
+            layer.confirm('确定删除此分类吗？', {
+                skin: 'layui-layer-admin'
+            }, function () {
+                layer.load(2);
+                admin.req('config/class/delete', {
+                    id: id
+                }, function (res) {
+                    layer.closeAll('loading');
+                    if (res.code == 200) {
+                        layer.msg(res.msg, {icon: 1});
+                        loadAuthData();
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                }, 'post');
+            });
+        }
+
+        // 显示表单弹窗
+        function showEditModel(mAuth) {
+            admin.open({
+                type: 1,
+                title: (mAuth ? '修改' : '添加') + '分类',
+                area: '800px',
+                content: $('#modelAuth').html(),
+                success: function (layero, dIndex) {
+                    if(!admin.hasPerm('config:class:update') && !admin.hasPerm('config:class:store')){
+                        $("#btnSave").remove();
+                    }
+
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    var url = mAuth ? 'config/class/update' : 'config/class/store';
+                    
+                    if(cagegorys != ""){
+                        $("#parent_id").append(cagegorys);
+                    }
+
+                    if(mAuth && cagegorys != ""){
+                        $("#parent_id option[value='" + mAuth['parent_id'] + "']").attr("selected", true);
+                    }
+
+                    form.val('modelForm', mAuth);  // 回显数据
+
+                    form.render('select');
+
+                    // 表单提交事件
+                    form.on('submit(modelAuthSubmit)', function (data) {
+                        layer.load(2);
+                        admin.req(url, data.field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.close(dIndex);
+                                layer.msg(res.msg, {icon: 1});
+                                loadAuthData();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'post');
+                        return false;
+                    });
+                }
+            });
+        }
+
+        // 搜索按钮点击事件
+        $('#authBtnSearch').click(function () {
+            var keyword = $('#authEdtSearch').val();
+            var $tds = $('#authTable').next('.treeTable').find('.layui-table-body tbody tr td');
+            if (!keyword) {
+                $tds.css('background-color', 'transparent');
+                layer.msg("请输入关键字", {icon: 5});
+                return;
+            }
+            var searchCount = 0;
+            $tds.each(function () {
+                $(this).css('background-color', 'transparent');
+                if ($(this).text().indexOf(keyword) >= 0) {
+                    $(this).css('background-color', 'rgba(250,230,160,0.5)');
+                    if (searchCount == 0) {
+                        var wrapperDOM = '.layui-body>div[lay-id]';
+                        if (config.pageTabs) {
+                            wrapperDOM = '.layui-tab-item.layui-show';
+                        }
+                        $(wrapperDOM).stop(true);
+                        $(wrapperDOM).animate({scrollTop: $(this).offset().top - 150}, 500);
+                    }
+                    searchCount++;
+                }
+            });
+            if (searchCount == 0) {
+                layer.msg("没有匹配结果", {icon: 5});
+            } else {
+                treetable.expandAll('#authTable');
+            }
+        });
+
+        $('#btnExpand').click(function () {
+            treetable.expandAll('#authTable');
+        });
+
+        $('#btnFold').click(function () {
+            treetable.foldAll('#authTable');
+        });
+
+        // 修改推荐
+        form.on('switch(userTableRecommend)', function (obj) {
+            if(!admin.hasPerm('config:class:recommend')){
+                layer.msg('没有操作权限', {icon: 2});
+                $(obj.elem).prop('checked', !obj.elem.checked);
+                form.render('checkbox');
+                return false;
+            }
+
+            layer.load(2);
+            admin.req('config/class/recommend', {
+                id: obj.elem.value,
+                recommend: obj.elem.checked ? 2 : 1
+            }, function (res) {
+                layer.closeAll('loading');
+                if (res.code == 200) {
+                    layer.msg(res.msg, {icon: 1});
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                    $(obj.elem).prop('checked', !obj.elem.checked);
+                    form.render('checkbox');
+                }
+            }, 'post');
+        });
+    });
+</script>

@@ -1,0 +1,69 @@
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-header">效果演示</div>
+        <div class="layui-card-body text-center" style="padding: 30px 0px;">
+            <button id="dialogBtn1" class="layui-btn">表单弹窗</button>
+            <button id="dialogBtn2" class="layui-btn">最大最小化</button>
+            <button id="dialogBtn3" class="layui-btn">确认弹窗</button>
+            <br><br>
+            <button id="dialogBtn5" class="layui-btn">输入弹窗</button>
+            <button id="dialogBtn4" class="layui-btn">更改主题</button>
+        </div>
+    </div>
+</div>
+
+<!-- js部分 -->
+<script>
+    layui.use(['layer', 'admin', 'code'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var admin = layui.admin;
+
+        $('#dialogBtn1').click(function () {
+            admin.open({
+                id: 'pswDialog',
+                title: '修改密码',
+                shade: 0,
+                url: 'components/tpl/password.html'
+            });
+        });
+
+        $('#dialogBtn2').click(function () {
+            admin.open({
+                type: 2,
+                title: '百度一下',
+                shade: 0,
+                maxmin: true,
+                resize: true,
+                area: ['640px', '480px'],
+                content: 'https://baidu.com'
+            });
+        });
+
+        $('#dialogBtn3').click(function () {
+            layer.confirm('确认删除吗？', {
+                skin: 'layui-layer-admin'
+            }, function (index) {
+                layer.close(index);
+                layer.msg('点击了确定');
+            });
+        });
+
+        $('#dialogBtn4').click(function () {
+            $('#dialogBtn1').trigger('click');
+            admin.popupRight({
+                url: 'components/tpl/theme.html'
+            });
+        });
+
+        $('#dialogBtn5').click(function () {
+            layer.prompt({
+                skin: 'layui-layer-admin layui-layer-prompt'
+            }, function (value, index, elem) {
+                layer.close(index);
+            });
+        });
+
+    });
+</script>

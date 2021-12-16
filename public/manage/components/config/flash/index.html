@@ -1,0 +1,387 @@
+<link rel="stylesheet" href="assets/module/formSelects/formSelects-v4.css"/>
+<style>
+    .layui-table-cell{height: auto;}
+</style>
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body" id="layPhotosTbImg">
+            <div class="layui-form toolbar">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <input id="userEdtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
+                    </div>
+                    <div class="layui-inline">
+                        <input id="date_at" class="layui-input date-icon" type="text" placeholder="显示时间段" autocomplete="off"/>
+                    </div>
+                    <div class="layui-inline">
+                        <select id="pingtai">
+                            <option value="">筛选平台</option>
+                            <option value="1">城市应急</option>
+                            <option value="2">企业应急通</option>
+                            <option value="4">应急中国</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <select id="system_type">
+                            <option value="">筛选系统</option>
+                            <option value="1">IOS</option>
+                            <option value="2">Android</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <select id="jump_ad">
+                            <option value="">筛选跳过广告</option>
+                            <option value="1">是</option>
+                            <option value="2">否</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <select id="status">
+                            <option value="">筛选状态</option>
+                            <option value="1">上架</option>
+                            <option value="2">下架</option>
+                        </select>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="flashBtnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+                        <button id="flashBtnAdd" class="layui-btn icon-btn"><i class="layui-icon">&#xe654;</i>添加</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="layui-table" id="userTable" lay-filter="userTable"></table>
+        </div>
+    </div>
+</div>
+
+<!-- 表格操作列 -->
+<script type="text/html" id="userTableBar">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="edit">修改</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+
+<!-- 表单弹窗 -->
+<script type="text/html" id="modelUser">
+    <form id="modelUserForm" lay-filter="modelUserForm" class="layui-form model-form">
+        <input name="id" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label">平台</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="pingtai" title="城市应急" value="1" lay-skin="primary">
+                <input type="checkbox" name="pingtai" title="企业应急通" value="2" lay-skin="primary"> 
+                <input type="checkbox" name="pingtai" title="应急中国" value="4" lay-skin="primary"> 
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">系统</label>
+            <div class="layui-input-block">
+                <select name="system_type" xm-select="system_type" lay-verType="tips" lay-verify="required">
+                    <option value="">请选择系统</option>
+                    <option value="2">Android</option>
+                    <option value="1">IOS</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-block">
+                <input name="title" placeholder="请输入标题" type="text" class="layui-input" maxlength="100"
+                       lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">闪屏页</label>
+            <div class="layui-input-inline upfile_btn">
+                <button type="button" class="layui-btn upfile_btn" id="upload_image"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+            </div>
+            <div class="layui-input-inline">
+                <div class="img_tip_content">图片宽度：1080px；图片高度：1920px；</div>
+            </div>            
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">预览图</label>
+            <div class="layui-input-block">
+                <div class="layui-upload-list layui-upload-imgs" id="layui-upload-imgs">
+                    <ul>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">闪屏页链接</label>
+            <div class="layui-input-block">
+                <input name="url" value="http://" placeholder="请输入跳转网址" type="text" class="layui-input" maxlength="200" />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">显示时间段</label>
+            <div class="layui-input-block">
+                <input id="edtDateFormBas" type="text" name="date_at" placeholder="请选择开始和结束日期" class="layui-input date-icon" autocomplete="off" lay-verType="msg" lay-verify="required"
+                        required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">限制显示</label>
+            <div class="layui-input-block">
+                <input type="radio" name="is_disable" value="1" title="是，限制次数" checked/>
+                <input type="radio" name="is_disable" value="2" title="否，永久显示"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">显示次数</label>
+            <div class="layui-input-block">
+                <select name="count" xm-select="count" lay-verType="tips" lay-verify="required">
+                    <option value="">请选择显示次数</option>
+                    <option value="1">1</option>
+                    <option value="1">2</option>
+                    <option value="1">3</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">闪屏时间</label>
+            <div class="layui-input-block">
+                <select name="display_time" xm-select="display_time" lay-verType="tips" lay-verify="required">
+                    <option value="">请选择闪屏时间</option>
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline layui-col-md5">
+                <label class="layui-form-label">跳过广告</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="jump_ad" value="1" title="是" checked/>
+                    <input type="radio" name="jump_ad" value="2" title="否"/>
+                </div>
+            </div>
+            <div class="layui-inline layui-col-md5">
+                <label class="layui-form-label">显示状态</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="status" value="1" title="上架" checked/>
+                    <input type="radio" name="status" value="2" title="下架"/>
+                </div>
+            </div>
+        </div>        
+        <div class="layui-form-item text-right">
+            <button class="layui-btn layui-btn-primary" type="button" ew-event="closeDialog">取消</button>
+            <button id="btnSave" class="layui-btn" lay-filter="modelUserSubmit" lay-submit>保存</button>
+        </div>
+    </form>
+</script>
+<script>
+    layui.use(['layer', 'table', 'form', 'upload', 'util', 'config', 'admin', 'laydate', 'alioss'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var table = layui.table;
+        var form = layui.form;
+        var upload = layui.upload;
+        var util = layui.util;
+        var config = layui.config;
+        var admin = layui.admin;
+        var laydate = layui.laydate;
+        var alioss = layui.alioss;
+
+        // 渲染laydate
+        laydate.render({elem: '#date_at', type: 'datetime', range: '到'});
+
+        // 渲染表格
+        var insTb = table.render({
+            elem: '#userTable',
+            url: config.base_server + 'config/flash/list',
+            method: 'post',
+            where: {
+                // access_token: config.getToken().access_token
+            },
+            headers: {
+                'Authorization': 'Bearer ' + config.getToken().access_token
+            },
+            page: true,
+            cellMinWidth: 100,
+            cols: [[
+                {type: 'numbers'},
+                {
+                    title: '闪屏页', width: 100, align: 'center', templet: function (d) {
+                        var str = "";
+                        if(d.oss_flash_url != "")
+                            str = '<img src="'+ d.oss_flash_url +'" class="table_img">';
+                        
+                        return str;
+                    }
+                },
+                {field: 'title', title: '标题'},
+                {field: 'platform_type', title: '平台', width: 80},
+                {field: 'system_type_name', title: '系统', width: 100},
+                {field: 'date_at', title: '显示时间段', width: 350},
+                {field: 'is_disable_name', title: '限制次数', width: 100},
+                {field: 'count', title: '显示次数', width: 100},
+                {field: 'jump_ad_name', title: '跳过广告', width: 100},
+                {field: 'status_name', title: '显示状态', width: 100},
+                {field: 'created_at', title: '发布时间', width: 180},
+                {align: 'center', toolbar: '#userTableBar', title: '操作', width: 150}
+            ]],
+            done: function(res, curr, count){
+                if(!admin.hasPerm('config:flash:edit')){
+                    $("a[lay-event='edit']").remove();
+                }
+                if(!admin.hasPerm('config:flash:delete')){
+                    $("a[lay-event='del']").remove();
+                }
+
+                layer.photos({
+                    photos: '#layPhotosTbImg',
+                    shade: .1,
+                    closeBtn: true
+                });
+            }
+        });
+        
+        form.render('select');
+        
+        setTimeout(function(){ 
+            form.render('select');
+        }, 1000);
+
+        // 添加按钮点击事件
+        if(!admin.hasPerm('config:flash:create')){
+            $("#flashBtnAdd").remove();
+        }
+        else
+        {
+            $('#flashBtnAdd').click(function () {
+                showEditModel();
+            });
+        }
+
+        // 搜索按钮点击事件
+        $('#flashBtnSearch').click(function () {
+            var value = $('#userEdtSearch').val();
+            var pingtai = $('#pingtai').val();
+            var system_type = $('#system_type').val();
+            var jump_ad = $('#jump_ad').val();
+            var status = $('#status').val();
+
+            insTb.reload({where: {search: value, pingtai: pingtai, system_type: system_type, jump_ad:jump_ad, status:status}});
+        });
+
+        // 工具条点击事件
+        table.on('tool(userTable)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+
+            if (layEvent === 'edit') { // 修改
+                showEditModel(data);
+            } else if (layEvent === 'del') {  // 删除
+                layer.confirm('确定要删除吗？', {
+                    skin: 'layui-layer-admin'
+                }, function (i) {
+                    layer.close(i);
+                    layer.load(2);
+                    admin.req('config/flash/delete', {
+                        id: data.id
+                    }, function (res) {
+                        layer.closeAll('loading');
+                        if (res.code == 200) {
+                            layer.msg(res.msg, {icon: 1});
+                            insTb.reload();
+                        } else {
+                            layer.msg(res.msg, {icon: 2});
+                        }
+                    }, 'post');
+                });
+            }
+        });
+
+        // 显示表单弹窗
+        function showEditModel(data) {
+            admin.open({
+                type: 1,
+                title: (data ? '修改' : '添加') + '轮播图',
+                area: '1000px',
+                content: $('#modelUser').html(),
+                success: function (layero, dIndex) {
+                    if(!admin.hasPerm('config:flash:store') && !admin.hasPerm('config:flash:update')){
+                        $("#btnSave").remove();
+                    }
+
+                    $(layero).children('.layui-layer-content').css('overflow', 'visible');
+                    var url = data ? 'config/flash/update' : 'config/flash/store';  
+
+                    var date_option = {elem: '#edtDateFormBas', type: 'datetime', range: '到'};
+
+                    // 回显数据
+                    if (data) {
+                        $("input:checkbox[name='pingtai']").val(data.pingtai);
+
+                        $("input[name='is_disable']").val([data.is_disable]);
+                        $("input[name='jump_ad']").val([data.jump_ad]);
+                        $("input[name='status']").val([data.status]);
+                        
+                        if(data.oss_flash_url != "") {                           
+                            $("#layui-upload-imgs ul").append('<li><img src="'+ data.oss_flash_url +'" data-path="'+ data.flash_url +'"><i class="layui-icon layui-icon-close-fill"></i></li>');
+                        }
+
+                        date_option.value = data.start_at + " " + date_option.range + " " + data.end_at;
+                        data.date_at = date_option.value;
+
+                        form.val('modelUserForm', data);
+                    }
+                    else
+                    {
+                        date_option.min = 0;
+                        form.render('radio');
+                        form.render('checkbox');
+                        form.render('select');
+                    }
+
+                    // 渲染laydate
+                    laydate.render(date_option);
+
+                    //上传轮播图
+                    var options = {
+                        multiple: false,
+                        number: 1
+                    };
+
+                    alioss.initUpload(options);
+
+                    // 表单提交事件
+                    form.on('submit(modelUserSubmit)', function (data) {
+                        if($("#layui-upload-imgs ul li").length > 1 ){
+                            layer.msg("闪屏页只能上传1张图片", {icon: 2});
+                            return false;
+                        }
+
+                        layer.load(2);                       
+                        var field = data.field;
+                        field.pingtai = 0;
+                        
+                        $("input[name='pingtai']:checkbox:checked").each(function(){ 
+                            field.pingtai += parseInt($(this).val());
+                        });
+
+                        field.flash_url = $("#layui-upload-imgs ul li img").eq(0).attr("data-path");
+                        if(field.flash_url == undefined) {
+                            field.flash_url = "";
+                        }
+
+                        admin.req(url, field, function (res) {
+                            layer.closeAll('loading');
+                            if (res.code == 200) {
+                                layer.close(dIndex);
+                                layer.msg(res.msg, {icon: 1});
+                                insTb.reload();
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }, 'post');
+                        return false;
+                    });
+                }
+            });
+        };
+    });
+</script>

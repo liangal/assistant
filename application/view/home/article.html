@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>{$article['title']}</title>
+    <link rel="stylesheet" type="text/css" href="/home/css/article-content.css" />
+</head>
+<body>
+    {include file='/home/layouts/download'}
+    <div class="app">
+        <div class="content-box">
+            <h3 class="content-title">{$article['title']}</h3>
+            <p class="from">{$article['source']} {$article['created_date']} {$article['created_time']}</p>
+            <div class="content">{$article['content'] | raw}</div>
+        </div>
+    </div>
+</body>
+</html>

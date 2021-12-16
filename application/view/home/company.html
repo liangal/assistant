@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>{$company['name']}</title>
+    <link rel="stylesheet" type="text/css" href="/home/css/core-content.css" />
+    <link rel="stylesheet" type="text/css" href="/home/css/swiper.min.css" />
+</head>
+
+<body>
+    {include file='/home/layouts/download'}
+    <div class="app">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <!-- 下面是轮播的图片 -->
+                <div class="swiper-slide">
+                    {volist name="company['images']" id="image"}
+                    <img src="{$image}">
+                    {/volist}
+                </div>
+            </div>
+        </div>
+        <div class="content-box">
+            <h3 class="com_title">{$company['name']}</h3>
+            <p class="content active">{$company['content'] | raw}</p>
+            <img src="/home/image/down.png" class="btn active">
+        </div>
+        <div class="info-box">
+            <ul class="info-list">
+                <li>
+                    <div class="pic">
+                        <img src="/home/image/time.png">
+                    </div>
+                    <p>营业时间：<span class="business_at">{$company['business_at']}</span></p>
+                </li>
+                <li>
+                    <div class="pic">
+                        <img src="/home/image/phone.png">
+                    </div>
+                    <p class="phone"><a href="tel:{$company['phone']}">{$company['phone']}</a></p>
+                </li>
+                <li>
+                    <div class="pic">
+                        <img src="/home/image/location2.png">
+                    </div>
+                    <p><span class="address" id="address">{$company['address']}</span></p>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="/home/js/zepto.js"></script>
+<script type="text/javascript" src="/home/js/swiper.min.js"></script>
+{notempty name="sign"}
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script type="text/javascript">
+    wx.config({
+        debug: false,
+        appId: '{$sign["appid"]}',
+        timestamp: '{$sign["timestamp"]}', 
+        nonceStr: '{$sign["noncestr"]}', 
+        signature: '{$sign["signature"]}',
+        jsApiList: ["openLocation"]
+    });
+
+    wx.ready(function(){
+
+    });
+
+    wx.error(function(res){
+
+    });
+
+    $(function(){          
+        $("#address").click(function (){
+            wx.openLocation({
+                latitude: {$company["lat"]}, // 纬度，浮点数，范围为90 ~ -90
+                longitude: {$company["lng"]}, // 经度，浮点数，范围为180 ~ -180。
+                name: '{$company["name"]}', // 位置名
+                address: '{$company["address"]}', // 地址详情说明
+                scale: 18, // 地图缩放级别,整形值,范围从1~28。默认为最大
+                infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
+            });
+        })
+    })
+</script>
+{/notempty}
+<script type="text/javascript">
+$(function(){
+    $('.btn').click(function () {
+        if (!$(this).hasClass('active')) {
+            $('.content').addClass('active');
+            $(this).addClass('active').attr('src', '/home/image/down.png');
+        } else {
+            $('.content').removeClass('active');
+            $(this).removeClass('active').attr('src', '/home/image/up.png');
+        }
+    })
+})
+</script>
+</html>

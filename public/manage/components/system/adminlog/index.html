@@ -1,0 +1,54 @@
+<link rel="stylesheet" href="assets/module/formSelects/formSelects-v4.css"/>
+<!-- 正文开始 -->
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form toolbar">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <input id="userEdtSearch" class="layui-input" type="text" placeholder="输入关键字"/>
+                    </div>
+                    <div class="layui-inline">
+                        <button id="btnSearch" class="layui-btn icon-btn"><i class="layui-icon">&#xe615;</i>搜索</button>
+                    </div>
+                </div>
+            </div>
+
+            <table class="layui-table" id="userTable" lay-filter="userTable"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['table', 'config'], function () {
+        var $ = layui.jquery;        
+        var table = layui.table;
+        var config = layui.config;
+
+        // 渲染表格
+        var insTb = table.render({
+            elem: '#userTable',
+            url: config.base_server + 'system/adminlog/list',
+            method: 'post',
+            where: {},
+            headers: {
+                'Authorization': 'Bearer ' + config.getToken().access_token
+            },
+            page: true,
+            cellMinWidth: 100,
+            cols: [[
+                {type: 'numbers'},
+                {field: 'user_name', title: '用户名'}, 
+                {field: 'ip', title: '访问IP地址'},
+                {field: 'browser', title: '浏览器'},
+                {field: 'created_at', title: '创建时间'}
+            ]]
+        });
+
+        // 搜索按钮点击事件
+        $('#btnSearch').click(function () {
+            var value = $('#userEdtSearch').val();
+            insTb.reload({where: {search: value}});
+        });
+    });
+</script>

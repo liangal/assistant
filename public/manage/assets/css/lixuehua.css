@@ -1,0 +1,141 @@
+.video {display: inline-block; border-radius: 0px; border:1px solid #D2D2D2; padding: 10px 15px; background-color: #fff;}
+.video img {width: 100%; height: auto; cursor: pointer;}
+.video .title {height: 40px; line-height: 40px;}
+.video i,.video em{font-style: normal; display: inline-block; width: 49%; padding: 0px; margin: 0px;}
+.video em{font-style: normal; text-align: right;}
+.video em.line{color:#009688}
+
+/* 登录 */
+.login-body > .layui-card {
+    max-width: 700px;
+}
+
+.login-body .layui-card-header {
+    font-size: 28px;
+    text-align: center;
+    padding: 40px 0px;
+}
+
+.login-body-setion {
+    padding: 30px 20px;
+}
+.login_btn {
+    height: 48px;
+    line-height: 48px;
+    font-size: 16px;
+}
+.layui-form-item {
+    margin-bottom: 22px;
+}
+.layui-form-pane .layui-form-label {height: 48px; padding: 13px 15px;}
+.login_copy {font-size: 16px; text-align: center; color: #ffffff;}
+.top_content {color: #999; height: 38px; line-height: 38px; padding-left: 110px;}
+.img_tip_content {color: #999; height: 38px; line-height: 38px; width: 400px; padding-left: 10px;}
+.p-t-9 {padding-top: 9px;}
+.reports img { width: 100px; height: 100px; margin-right: 10px;}
+.layui-form-item .upfile_btn {width: 114px; margin-right: 0px;}
+
+.layui-layout-admin .layui-header .layui-logo img {height: 30px; margin-right: 5px;}
+.layui-upload-imgs ul {padding-top: 10px;height: 92px;}
+.layui-upload-imgs ul li {height: 92px; width: 92px; margin: 0 20px 10px 0; display: inline-block; position: relative;}
+.layui-upload-imgs ul li img {width: 92px; height: 92px;}
+.layui-upload-imgs ul li i {width: 20px; height: 26px; color: #000000; display: block; position: absolute; right: -5px; top:-12px; font-size: 26px; cursor: pointer; background-color: #fff; border-radius: 13px; z-index: 98;}
+.layui-upload-imgs ul li span {width: 92px; height: 92px; line-height: 92px; font-size: 16px; display: block; position: absolute; left: 0; top: 0; background-color: rgba(0, 0, 0, 0.5); text-align: center; color: #fff;}
+.layui-upload-imgs .progress_box {position: absolute; left: 0; bottom: 0;z-index: 99; width: 100%; height: 25px;}
+.table_img {width: 50px;height: 50px;max-width: none;cursor: pointer;}
+
+/* 文章预览 */
+.content-view_box{padding:10px 14px 46px}
+.content-view_box .content-title{font-size:20px;line-height:30px;color:#000;margin-bottom:10px;text-align:center}
+.content-view_box .from{font-size:12px;line-height:14px;color:#999;margin-bottom:10px;text-align:center}
+.content-view_box .content{font-size:16px;line-height:30px;color:#000}
+.content-view_box .content p{font-size:16px;line-height:30px;color:#000}
+.content-view_box .content iframe,.content-box .content video{width:100%;height:250px;object-fit:fill}
+.content-view_box .content img{width:100%;margin-bottom:14px}
+
+.field-color-red{color: red; font-size: 14px;}
+
+.step-region {
+    position: relative;
+    margin-bottom: 10px;
+}
+.ui-step {
+    padding: 14px 0 8px 0;
+    zoom: 1;
+    margin: 0 50px;
+}
+
+.ui-step-4 li {
+    width: 24.9999%;
+}
+.ui-step li {
+    float: left;
+    position: relative;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    text-align: center;
+}
+li {
+    list-style: none;
+}
+
+
+
+
+.ui-step li::before, .ui-step li::after {
+    position: absolute;
+    left: 0;
+    top: 27px;
+    display: block;
+    content: ' ';
+    width: 50%;
+    height: 4px;
+    background: #f2f3f7;
+    z-index: 1;
+}
+.ui-step li.ui-step-done::before, .ui-step li.ui-step-done::after, .ui-step li.ui-step-done .ui-step-number {
+    background: #54c952;
+}
+.ui-step li:first-child::before {
+    width: 0;
+}
+.ui-step li::after {
+    left: 50%;
+}
+.ui-step li:last-child::after {
+    width: 0;
+}
+
+.ui-step li.ui-step-done .ui-step-number {
+    color: #fff;
+}
+.ui-step .ui-step-number {
+    position: relative;
+    display: inline-block;
+    width: 37px;
+    height: 37px;
+    margin: 10px 0;
+    line-height: 37px;
+    background: #f2f3f7;
+    color: #cac9c9;
+    border-radius: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+.ui-step .ui-step-title {
+    color: #333;
+    font-size: 12px;
+    line-height: 18px;
+}
+.ui-step .ui-step-meta {
+    color: #ccc;
+}
+.ui-step:after {
+    content: "";
+    display: table;
+    clear: both;
+}
